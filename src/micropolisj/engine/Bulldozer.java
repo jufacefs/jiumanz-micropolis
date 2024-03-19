@@ -101,11 +101,16 @@ class Bulldozer extends ToolStroke
 	{
 		for (int yy = 0; yy < h; yy++) {
 			for (int xx = 0; xx < w; xx++) {
+				int myTile = eff.getTile(0, 0);
+		
 				int tile = eff.getTile(xx,yy);
+				TileSpec ts=Tiles.get(tile);
+				ts.owner=null;
+				
 				if (tile == CLEAR)
 					continue;
 
-				if (tile != RADTILE && tile != DIRT) {
+				if (tile != DIRT) {
 					int z = inPreview ? 0 : city.PRNG.nextInt(3);
 					int nTile = TINYEXP + z;
 					eff.setTile(xx, yy, nTile);
