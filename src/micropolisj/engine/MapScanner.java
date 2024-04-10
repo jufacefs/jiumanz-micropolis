@@ -41,7 +41,8 @@ class MapScanner extends TileBehavior
 		STADIUM_EMPTY,
 		STADIUM_FULL,
 		AIRPORT,
-		SEAPORT;
+		SEAPORT,
+		PRISON;
 	}
 
 	@Override
@@ -81,11 +82,23 @@ class MapScanner extends TileBehavior
 		case AIRPORT:
 			doAirport();
 			return;
+			
+		case PRISON:
+			doPrison();
+			return;
+			
+			
+			
 		case SEAPORT:
 			doSeaport();
 			return;
 		default:
 			assert false;
+			
+			
+		
+			
+		
 		}
 	}
 
@@ -234,6 +247,32 @@ class MapScanner extends TileBehavior
 		city.policeCount++;
 		if ((city.cityTime % 8) == 0) {
 			repairZone(POLICESTATION, 3);
+		}
+
+		int z;
+		if (powerOn) {
+			z = city.policeEffect;
+		} else {
+			z = city.policeEffect / 2;
+		}
+
+		traffic.mapX = xpos;
+		traffic.mapY = ypos;
+		if (!traffic.findPerimeterRoad()) {
+			z /= 2;
+		}
+
+		city.policeMap[ypos/8][xpos/8] += z;
+	}
+	
+	
+	
+	void doPrison()
+	{
+		boolean powerOn = checkZonePower();
+		city.policeCount++;
+		if ((city.cityTime % 8) == 0) {
+			repairZone(PRISON, 3);
 		}
 
 		int z;

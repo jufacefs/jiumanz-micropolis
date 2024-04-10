@@ -151,6 +151,11 @@ public class TileConstants
 	static final char VBRDG2 = 950;
 	static final char VBRDG3 = 951;
 	public static final char LAST_TILE = 956;
+	
+	//adding the Prison tile and CriminalsRoaming disaster tile
+	static final char PRISON = 964;
+	static final char CRIMINAL =957;
+
 
 	static final char [] RoadTable = new char[] {
 		ROADS, ROADS2, ROADS, ROADS3,
@@ -400,6 +405,23 @@ public class TileConstants
 		return (tile == DIRT || (isDozeable(tile) && isCombustible(tile)));
 	}
 
+	
+	
+
+	
+	//new boolean make sure criminals roam on streets
+	static boolean CriminalCanRoam(int tile)
+	{
+		assert (tile & LOMASK) == tile;
+
+		return ((isRoad(tile) || isRail(tile)));
+	}
+	
+	
+	
+	
+	
+	
 	/**
 	 * Note: does not include rail/road tiles.
 	 * @see #isRoadAny

@@ -27,7 +27,19 @@ public enum MicropolisMessage
 	HIGH_CRIME,            //  11            doMessages           1/19
 	HIGH_TRAFFIC,          //  12            doMessages           1/20
 	NEED_FIRESTATION,      //  13            doMessages           1/19
-	NEED_POLICE,           //  14            doMessages           1/19
+	NEED_POLICE,           //  14            doMessages    
+	
+	
+	
+	//new features
+	
+	PRISON_NEED_LINK,           //  14            doMessages 
+	CRIMINALS_ROAMING,
+	
+	
+	
+	
+	
 	BLACKOUTS,             //  15            doMessages           1/19
 	HIGH_TAXES,            //  16            doMessages           1/19
 	ROADS_NEED_FUNDING,    //  17            doMessages

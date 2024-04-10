@@ -119,6 +119,11 @@ public class Micropolis
 	int hospitalCount;
 	int churchCount;
 	int policeCount;
+	
+	int prisonCount;
+	
+	
+	
 	int fireStationCount;
 	int stadiumCount;
 	int coalCount;
@@ -531,7 +536,15 @@ public class Micropolis
 		indZoneCount = 0;
 		hospitalCount = 0;
 		churchCount = 0;
+		
+		
+		
 		policeCount = 0;
+		prisonCount=0;
+		
+		
+		
+		
 		fireStationCount = 0;
 		stadiumCount = 0;
 		coalCount = 0;
@@ -880,6 +893,13 @@ public class Micropolis
 
 		fireMapOverlayDataChanged(MapState.POLICE_OVERLAY);
 	}
+	
+	
+	
+	
+	
+	
+	
 
 	void doDisasters()
 	{
@@ -918,6 +938,10 @@ public class Micropolis
 				makeMonster();
 			}
 			break;
+		case 9:
+			setCriminalRoaming();
+			break;
+			
 		}
 	}
 
@@ -1446,29 +1470,31 @@ public class Micropolis
 	Map<String,TileBehavior> tileBehaviors;
 	void initTileBehaviors()
 	{
-		HashMap<String,TileBehavior> bb;
-		bb = new HashMap<String,TileBehavior>();
+//		HashMap<String,TileBehavior> bb;
+		tileBehaviors = new HashMap<String,TileBehavior>();
 
-		bb.put("FIRE", new TerrainBehavior(this, TerrainBehavior.B.FIRE));
-		bb.put("FLOOD", new TerrainBehavior(this, TerrainBehavior.B.FLOOD));
-		bb.put("RADIOACTIVE", new TerrainBehavior(this, TerrainBehavior.B.RADIOACTIVE));
-		bb.put("ROAD", new TerrainBehavior(this, TerrainBehavior.B.ROAD));
-		bb.put("RAIL", new TerrainBehavior(this, TerrainBehavior.B.RAIL));
-		bb.put("EXPLOSION", new TerrainBehavior(this, TerrainBehavior.B.EXPLOSION));
-		bb.put("RESIDENTIAL", new MapScanner(this, MapScanner.B.RESIDENTIAL));
-		bb.put("HOSPITAL_CHURCH", new MapScanner(this, MapScanner.B.HOSPITAL_CHURCH));
-		bb.put("COMMERCIAL", new MapScanner(this, MapScanner.B.COMMERCIAL));
-		bb.put("INDUSTRIAL", new MapScanner(this, MapScanner.B.INDUSTRIAL));
-		bb.put("COAL", new MapScanner(this, MapScanner.B.COAL));
-		bb.put("NUCLEAR", new MapScanner(this, MapScanner.B.NUCLEAR));
-		bb.put("FIRESTATION", new MapScanner(this, MapScanner.B.FIRESTATION));
-		bb.put("POLICESTATION", new MapScanner(this, MapScanner.B.POLICESTATION));
-		bb.put("STADIUM_EMPTY", new MapScanner(this, MapScanner.B.STADIUM_EMPTY));
-		bb.put("STADIUM_FULL", new MapScanner(this, MapScanner.B.STADIUM_FULL));
-		bb.put("AIRPORT", new MapScanner(this, MapScanner.B.AIRPORT));
-		bb.put("SEAPORT", new MapScanner(this, MapScanner.B.SEAPORT));
-
-		this.tileBehaviors = bb;
+		tileBehaviors.put("FIRE", new TerrainBehavior(this, TerrainBehavior.B.FIRE));
+		tileBehaviors.put("FLOOD", new TerrainBehavior(this, TerrainBehavior.B.FLOOD));
+		tileBehaviors.put("RADIOACTIVE", new TerrainBehavior(this, TerrainBehavior.B.RADIOACTIVE));
+		tileBehaviors.put("ROAD", new TerrainBehavior(this, TerrainBehavior.B.ROAD));
+		tileBehaviors.put("RAIL", new TerrainBehavior(this, TerrainBehavior.B.RAIL));
+		tileBehaviors.put("EXPLOSION", new TerrainBehavior(this, TerrainBehavior.B.EXPLOSION));
+		tileBehaviors.put("RESIDENTIAL", new MapScanner(this, MapScanner.B.RESIDENTIAL));
+		tileBehaviors.put("HOSPITAL_CHURCH", new MapScanner(this, MapScanner.B.HOSPITAL_CHURCH));
+		tileBehaviors.put("COMMERCIAL", new MapScanner(this, MapScanner.B.COMMERCIAL));
+		tileBehaviors.put("INDUSTRIAL", new MapScanner(this, MapScanner.B.INDUSTRIAL));
+		tileBehaviors.put("COAL", new MapScanner(this, MapScanner.B.COAL));
+		tileBehaviors.put("NUCLEAR", new MapScanner(this, MapScanner.B.NUCLEAR));
+		tileBehaviors.put("FIRESTATION", new MapScanner(this, MapScanner.B.FIRESTATION));
+		tileBehaviors.put("POLICESTATION", new MapScanner(this, MapScanner.B.POLICESTATION));
+		tileBehaviors.put("STADIUM_EMPTY", new MapScanner(this, MapScanner.B.STADIUM_EMPTY));
+		tileBehaviors.put("STADIUM_FULL", new MapScanner(this, MapScanner.B.STADIUM_FULL));
+		tileBehaviors.put("AIRPORT", new MapScanner(this, MapScanner.B.AIRPORT));
+		tileBehaviors.put("SEAPORT", new MapScanner(this, MapScanner.B.SEAPORT));
+		
+		
+		//new zone behavior Prison
+		tileBehaviors.put("PRISON", new MapScanner(this, MapScanner.B.PRISON));
 	}
 
 	void mapScan(int x0, int x1)
@@ -2270,7 +2296,50 @@ public class Micropolis
 			sendMessageAt(MicropolisMessage.FIRE_REPORT, x, y);
 		}
 	}
+	
+	
+	
+	//new disaster Criminal Roaming by duplicating the Monster system
+	// When Criminals is enabled at the menu, criminals will appear at where the crime rate is highest if there's no police station
+	// When there are police stations but the stations are not linked to the prison, criminal will appear
+	//at the police station and escape/roam around
+	public void setCriminalRoaming()
+	{
+		MonsterSprite monster = (MonsterSprite) getSprite(SpriteKind.GOD);
+		if (monster != null) {
+			// already have a monster in town
+			monster.soundCount = 1;
+			monster.count = 1000;
+			monster.flag = false;
+			monster.destX = pollutionMaxLocationX;
+			monster.destY = pollutionMaxLocationY;
+			return;
+		}
 
+		// try to find a suitable starting spot for monster
+
+		for (int i = 0; i < 300; i++) {
+			int x = PRNG.nextInt(getWidth() - 19) + 10;
+			int y = PRNG.nextInt(getHeight() - 9) + 5;
+			int t = getTile(x, y);
+			if (CriminalCanRoam(t)) {
+				setTile(x, y, CRIMINAL);
+				return;
+			}
+		}
+
+		// no "nice" location found, just start in center of map then
+		setTile(getWidth()/2, getHeight()/2,CRIMINAL);
+	}
+
+	
+
+	
+	
+	
+	
+	
+	
 	public void makeFire()
 	{
 		// forty attempts at finding place to start fire
@@ -2599,6 +2668,15 @@ public class Micropolis
 				sendMessage(MicropolisMessage.NEED_POLICE);
 			}
 			break;
+		case 49:
+			if (policeCount > 1 && prisonCount == 0) {
+				sendMessage(MicropolisMessage.PRISON_NEED_LINK);
+			}
+			break;
+			
+			
+			
+			
 		case 51:
 			if (cityTax > 12) {
 				sendMessage(MicropolisMessage.HIGH_TAXES);

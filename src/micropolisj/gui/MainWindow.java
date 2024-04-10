@@ -611,6 +611,24 @@ public class MainWindow extends JFrame
 			}
 			}));
 		disastersMenu.add(menuItem);
+		
+		
+		
+		
+		// Add the Criminals Roaming disaster to the menu
+		
+		menuItem = new JMenuItem(strings.getString("menu.disasters.CRIMINAL"));
+		setupKeys(menuItem, "menu.disasters.CRIMINAL");
+		menuItem.addActionListener(wrapActionListener(
+			new ActionListener() {
+			public void actionPerformed(ActionEvent ev)
+			{
+				onInvokeDisasterClicked(Disaster.CRIMINAL);
+			}
+			}));
+		disastersMenu.add(menuItem);
+		
+		
 
 		menuItem = new JMenuItem(strings.getString("menu.disasters.FLOOD"));
 		setupKeys(menuItem, "menu.disasters.FLOOD");
@@ -1046,6 +1064,12 @@ public class MainWindow extends JFrame
 		gridBox.add(b6,c);
 
 		b6.add(makeToolBtn(MicropolisTool.AIRPORT));
+		
+		
+		c.gridy++;
+		Box b7 = new Box(BoxLayout.X_AXIS);
+		gridBox.add(b7,c);
+		b7.add(makeToolBtn(MicropolisTool.PRISON));
 
 		// add glue to make all elements align toward top
 		c.gridy++;
@@ -1541,6 +1565,12 @@ public class MainWindow extends JFrame
 			break;
 		case EARTHQUAKE:
 			getEngine().makeEarthquake();
+			break;
+			
+			
+			
+		case CRIMINAL:
+			getEngine().setCriminalRoaming();
 			break;
 		default:
 			assert false; //unknown disaster
