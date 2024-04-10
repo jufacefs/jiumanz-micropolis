@@ -1572,6 +1572,8 @@ public class MainWindow extends JFrame
 		case CRIMINAL:
 			getEngine().setCriminalRoaming();
 			break;
+			
+			
 		default:
 			assert false; //unknown disaster
 		}

@@ -27,7 +27,9 @@ class TerrainBehavior extends TileBehavior
 		RADIOACTIVE,
 		ROAD,
 		RAIL,
-		EXPLOSION;
+		EXPLOSION,
+		CRIMINAL;
+		
 	}
 
 	@Override
@@ -52,6 +54,12 @@ class TerrainBehavior extends TileBehavior
 		case EXPLOSION:
 			doExplosion();
 			return;
+			
+		case CRIMINAL:
+			System.out.println("In apply");
+			doCriminal();
+			return;
+			
 		default:
 			assert false;
 		}
@@ -101,11 +109,50 @@ class TerrainBehavior extends TileBehavior
 		}
 	}
 
+	
+	
+	
+	void doCriminal()
+	{
+		final int [] DX = { 0, 1, 0, -1 };
+		final int [] DY = { -1, 0, 1, 0 };
+
+		System.out.println("here");
+		if (city.CriminalCnt != 0)
+		{
+			for (int z = 0; z < 4; z++)
+			{
+				if (PRNG.nextInt(8) == 0) {
+					int xx = xpos + DX[z];
+					int yy = ypos + DY[z];
+					if (city.testBounds(xx, yy)) {
+						int t = city.getTile(xx, yy);
+						if (CriminalCanRoam(t))
+						
+						{
+							System.out.println("133");
+							city.setTile(xx, yy, CRIMINAL);
+						}
+					}
+				}
+			}
+		}
+		else {
+			if (PRNG.nextInt(16) == 0) {
+				city.setTile(xpos, ypos, DIRT);
+			}
+		}
+	}
+	
+	
 	/**
 	 * Called when the current tile is a flooding tile.
 	 */
 	void doFlood()
 	{
+		
+		
+		System.out.println("在这");
 		final int [] DX = { 0, 1, 0, -1 };
 		final int [] DY = { -1, 0, 1, 0 };
 

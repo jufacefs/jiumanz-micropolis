@@ -1005,8 +1005,8 @@
 954   misc_animation@0,2032  (conducts)(description=#26)(becomes=955)(onshutdown=820)
 955   misc_animation@0,2048  (conducts)(description=#26)(becomes=952)(onshutdown=820)
 # unused #
-956   misc_animation@0,2064
-957   misc_animation@0,2080
+956   misc_animation@0,2064  
+957   misc_animation@0,2080  (noburn)(behavior=CRIMINAL)
 958   misc_animation@0,2096
 959   misc_animation@0,2112
 # BEGIN PRISON #

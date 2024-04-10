@@ -231,8 +231,12 @@ public class TileConstants
 	public static String getTileBehavior(int tile)
 	{
 		assert (tile & LOMASK) == tile;
-
+	
 		TileSpec ts = Tiles.get(tile);
+		if (tile== 957) {
+			System.out.println("getTIleBeHavior+tileNumber"+ts.tileNumber+ ts.getAttribute("behavior"));
+		}
+		
 		return ts != null ? ts.getAttribute("behavior") : null;
 	}
 
@@ -414,7 +418,7 @@ public class TileConstants
 	{
 		assert (tile & LOMASK) == tile;
 
-		return ((isRoad(tile) || isRail(tile)));
+		return ((tile>=ROADBASE) );
 	}
 	
 	

@@ -47,7 +47,10 @@ public class Tiles
 		tiles = new TileSpec[tileNames.length];
 
 		for (int i = 0; i < tileNames.length; i++) {
+			
 			String tileName = tileNames[i];
+			
+			
 			String rawSpec = tilesRc.getProperty(tileName);
 			if (rawSpec == null) {
 				break;
@@ -94,6 +97,7 @@ public class Tiles
 	 */
 	public static TileSpec get(int tileNumber)
 	{
+//		System.out.println("TileNumber in TileSpec="+tileNumber);
 		if (tileNumber >= 0 && tileNumber < tiles.length) {
 			return tiles[tileNumber];
 		}

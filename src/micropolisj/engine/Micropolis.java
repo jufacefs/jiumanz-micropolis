@@ -191,6 +191,14 @@ public class Micropolis
 	int floodX;
 	int floodY;
 
+	
+	
+	int CriminalCnt;
+	int CriminalX;
+	int CriminalY;
+	
+	
+	
 	public int cityTime;  //counts "weeks" (actually, 1/48'ths years)
 	int scycle; //same as cityTime, except mod 1024
 	int fcycle; //counts simulation steps (mod 1024)
@@ -477,7 +485,7 @@ public class Micropolis
 		// check to make sure we aren't setting an upper bit using
 		// this method
 		assert (newTile & LOMASK) == newTile;
-
+		System.out.println("在settile"+newTile);
 		if (map[ypos][xpos] != newTile)
 		{
 			map[ypos][xpos] = newTile;
@@ -906,6 +914,10 @@ public class Micropolis
 		if (floodCnt > 0) {
 			floodCnt--;
 		}
+		
+		if (CriminalCnt > 0) {
+			CriminalCnt--;
+		}
 
 		final int [] DisChance = { 480, 240, 60 };
 		if (noDisasters)
@@ -923,6 +935,7 @@ public class Micropolis
 		case 2:
 		case 3:
 			makeFlood();
+			
 			break;
 		case 4:
 			break;
@@ -933,14 +946,14 @@ public class Micropolis
 			makeEarthquake();
 			break;
 		case 7:
+			setCriminalRoaming();
+			break;
 		case 8:
 			if (pollutionAverage > 60) {
 				makeMonster();
 			}
 			break;
-		case 9:
-			setCriminalRoaming();
-			break;
+		
 			
 		}
 	}
@@ -1495,12 +1508,17 @@ public class Micropolis
 		
 		//new zone behavior Prison
 		tileBehaviors.put("PRISON", new MapScanner(this, MapScanner.B.PRISON));
+		
+		tileBehaviors.put("CRIMINAL", new TerrainBehavior(this, TerrainBehavior.B.CRIMINAL));
+	
 	}
 
 	void mapScan(int x0, int x1)
 	{
+		System.out.println("x0x1="+x0+x1);
 		for (int x = x0; x < x1; x++)
 		{
+			
 			for (int y = 0; y < getHeight(); y++)
 			{
 				mapScanTile(x, y);
@@ -1510,13 +1528,23 @@ public class Micropolis
 
 	void mapScanTile(int xpos, int ypos)
 	{
+		
+		
 		int tile = getTile(xpos, ypos);
+		if (tile == FLOOD){
+		System.out.println("in mapScan"+xpos+ypos);
+		}
+		else if (tile == CRIMINAL){
+			System.out.println("CRIMNAL in mapScan"+xpos+ypos+tile);
+		}
 		String behaviorStr = getTileBehavior(tile);
 		if (behaviorStr == null) {
 			return; //nothing to do
 		}
-
+		System.out.println("behaviorStr="+behaviorStr);
 		TileBehavior b = tileBehaviors.get(behaviorStr);
+		System.out.println("b behavior"+b.tile);
+		
 		if (b != null) {
 			b.processTile(xpos, ypos);
 		}
@@ -2298,41 +2326,8 @@ public class Micropolis
 	}
 	
 	
-	
-	//new disaster Criminal Roaming by duplicating the Monster system
-	// When Criminals is enabled at the menu, criminals will appear at where the crime rate is highest if there's no police station
-	// When there are police stations but the stations are not linked to the prison, criminal will appear
-	//at the police station and escape/roam around
-	public void setCriminalRoaming()
-	{
-		MonsterSprite monster = (MonsterSprite) getSprite(SpriteKind.GOD);
-		if (monster != null) {
-			// already have a monster in town
-			monster.soundCount = 1;
-			monster.count = 1000;
-			monster.flag = false;
-			monster.destX = pollutionMaxLocationX;
-			monster.destY = pollutionMaxLocationY;
-			return;
-		}
+		
 
-		// try to find a suitable starting spot for monster
-
-		for (int i = 0; i < 300; i++) {
-			int x = PRNG.nextInt(getWidth() - 19) + 10;
-			int y = PRNG.nextInt(getHeight() - 9) + 5;
-			int t = getTile(x, y);
-			if (CriminalCanRoam(t)) {
-				setTile(x, y, CRIMINAL);
-				return;
-			}
-		}
-
-		// no "nice" location found, just start in center of map then
-		setTile(getWidth()/2, getHeight()/2,CRIMINAL);
-	}
-
-	
 
 	
 	
@@ -2439,22 +2434,27 @@ public class Micropolis
 
 	public void makeFlood()
 	{
+		
 		final int [] DX = { 0, 1, 0, -1 };
 		final int [] DY = { -1, 0, 1, 0 };
 
 		for (int z = 0; z < 300; z++) {
+			
 			int x = PRNG.nextInt(getWidth());
 			int y = PRNG.nextInt(getHeight());
 			int tile = getTile(x, y);
 			if (isRiverEdge(tile))
 			{
+				System.out.println("makeFlood");
 				for (int t = 0; t < 4; t++) {
 					int xx = x + DX[t];
 					int yy = y + DY[t];
 					if (testBounds(xx,yy)) {
 						int c = map[yy][xx];
 						if (isFloodable(c)) {
+							
 							setTile(xx, yy, FLOOD);
+							System.out.println("in makeFlood"+xx+yy);
 							floodCnt = 30;
 							sendMessageAt(MicropolisMessage.FLOOD_REPORT, xx, yy);
 							floodX = xx;
@@ -2466,6 +2466,45 @@ public class Micropolis
 			}
 		}
 	}
+	
+	
+	
+	
+
+	public void setCriminalRoaming()
+	{
+		final int [] DX = { 0, 1, 0, -1 };
+		final int [] DY = { -1, 0, 1, 0 };
+		
+		for (int z = 0; z < 300; z++) {
+			int x = PRNG.nextInt(getWidth());
+			int y = PRNG.nextInt(getHeight());
+			int tile = getTile(x, y);
+	
+			for (int t = 0; t < 4; t++) {
+				int xx = x + DX[t];
+				int yy = y + DY[t];
+			
+				if (testBounds(xx,yy)) {
+					
+				
+						int c = map[yy][xx];
+						if (CriminalCanRoam(c)) {
+							System.out.println("in setCriminalRoaming"+xx+yy);
+							setTile(xx, yy, CRIMINAL);
+							CriminalCnt = 30;
+							sendMessageAt(MicropolisMessage.CRIMINALS_ROAMING, xx, yy);
+							CriminalX = xx;
+							CriminalY = yy;
+							return;
+						}
+					}
+				}
+			}
+		
+		
+	}
+
 
 	/**
 	 * Makes all component tiles of a zone bulldozable.

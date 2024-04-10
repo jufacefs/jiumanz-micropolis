@@ -12,7 +12,7 @@ import java.util.*;
 
 public class TileSpec
 {
-	int tileNumber;
+	public int tileNumber;
 	String name;
 	TileSpec animNext;
 	TileSpec onPower;
@@ -188,6 +188,7 @@ public class TileSpec
 			}
 		}
 
+		
 		this.canBulldoze = getBooleanAttribute("bulldozable");
 		this.canBurn = !getBooleanAttribute("noburn");
 		this.canConduct = getBooleanAttribute("conducts");
@@ -195,7 +196,16 @@ public class TileSpec
 		this.zone = getBooleanAttribute("zone");
 	}
 
+	
+
+				
+				
+				
+				
+	
 	static class Scanner
+	
+	
 	{
 		String str;
 		int off = 0;

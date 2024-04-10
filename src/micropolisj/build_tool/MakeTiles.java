@@ -78,9 +78,12 @@ public class MakeTiles
 				new FileInputStream(recipeFile),
 				UTF8
 			));
-
+//		System.out.println("recipe"+recipe);
 		// count number of images
 		String [] tileNames = generateTileNames(recipe);
+		for (String string:tileNames) {
+			System.out.println("String in recipe.load"+string);
+		}
 		int ntiles = COUNT_TILES == -1 ? tileNames.length : COUNT_TILES;
 
 		// actually assemble the image
@@ -95,9 +98,12 @@ public class MakeTiles
 
 			String tileName = tileNames[tileNumber];
 			String rawSpec = recipe.getProperty(tileName);
+			
 			assert rawSpec != null;
 
 			TileSpec tileSpec = TileSpec.parse(tileNumber, tileName, rawSpec, recipe);
+			
+			System.out.println(tileSpec.getAttribute("behavior")+tileSpec.tileNumber);
 			FrameSpec ref = parseFrameSpec(tileSpec);
 			if (ref == null) {
 				// tile is defined, but it has no images
