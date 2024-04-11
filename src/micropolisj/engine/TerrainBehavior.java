@@ -56,7 +56,6 @@ class TerrainBehavior extends TileBehavior
 			return;
 			
 		case CRIMINAL:
-			System.out.println("In apply");
 			doCriminal();
 			return;
 			
@@ -116,8 +115,7 @@ class TerrainBehavior extends TileBehavior
 	{
 		final int [] DX = { 0, 1, 0, -1 };
 		final int [] DY = { -1, 0, 1, 0 };
-
-		System.out.println("here");
+		
 		if (city.CriminalCnt != 0)
 		{
 			for (int z = 0; z < 4; z++)
@@ -130,6 +128,10 @@ class TerrainBehavior extends TileBehavior
 						if (CriminalCanRoam(t))
 						
 						{
+							if (isZoneCenter(t))
+								{
+								city.killZone(xx, yy, t);
+								}
 							System.out.println("133");
 							city.setTile(xx, yy, CRIMINAL);
 						}
@@ -141,6 +143,15 @@ class TerrainBehavior extends TileBehavior
 			if (PRNG.nextInt(16) == 0) {
 				city.setTile(xpos, ypos, DIRT);
 			}
+		}
+		
+		int cov = city.getPoliceStationCoverage(xpos, ypos);
+		int rate = cov > 100 ? 1 :
+			cov > 20 ? 2 :
+			cov != 0 ? 3 : 10;
+
+		if (PRNG.nextInt(rate+1) == 0) {
+			city.setTile(xpos, ypos,DIRT);
 		}
 	}
 	
@@ -155,7 +166,7 @@ class TerrainBehavior extends TileBehavior
 		System.out.println("在这");
 		final int [] DX = { 0, 1, 0, -1 };
 		final int [] DY = { -1, 0, 1, 0 };
-
+		
 		if (city.floodCnt != 0)
 		{
 			for (int z = 0; z < 4; z++)

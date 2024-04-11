@@ -263,6 +263,17 @@ class MapScanner extends TileBehavior
 		}
 
 		city.policeMap[ypos/8][xpos/8] += z;
+		
+
+		
+		int trafficGood;
+		
+		trafficGood = makeTraffic(ZoneType.POLICESTATION);
+		if( trafficGood==1) {
+			System.out.println("traffic to policestation");
+			
+		}
+		
 	}
 	
 	
@@ -288,9 +299,22 @@ class MapScanner extends TileBehavior
 			z /= 2;
 		}
 
+		
 		city.policeMap[ypos/8][xpos/8] += z;
+		int trafficGood;
+		
+		trafficGood = makeTraffic(ZoneType.PRISON);
+		if( trafficGood==1) {
+			System.out.println("traffic to prison");}
+			
+	
+		
 	}
 
+	
+	
+	
+	
 	void doStadiumEmpty()
 	{
 		boolean powerOn = checkZonePower();

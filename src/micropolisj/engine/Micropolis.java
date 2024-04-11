@@ -485,7 +485,7 @@ public class Micropolis
 		// check to make sure we aren't setting an upper bit using
 		// this method
 		assert (newTile & LOMASK) == newTile;
-		System.out.println("在settile"+newTile);
+		
 		if (map[ypos][xpos] != newTile)
 		{
 			map[ypos][xpos] = newTile;
@@ -1150,6 +1150,14 @@ public class Micropolis
 		return fireRate[ypos/8][xpos/8];
 	}
 
+	public int getPoliceStationCoverage(int sx, int sy)
+	{
+		return policeMapEffect[sy/8][sx/8];
+	}
+
+
+	
+	
 	/** Accessor method for landValueMem overlay. */
 	public int getLandValue(int xpos, int ypos)
 	{
@@ -1515,7 +1523,7 @@ public class Micropolis
 
 	void mapScan(int x0, int x1)
 	{
-		System.out.println("x0x1="+x0+x1);
+	
 		for (int x = x0; x < x1; x++)
 		{
 			
@@ -1531,20 +1539,14 @@ public class Micropolis
 		
 		
 		int tile = getTile(xpos, ypos);
-		if (tile == FLOOD){
-		System.out.println("in mapScan"+xpos+ypos);
-		}
-		else if (tile == CRIMINAL){
-			System.out.println("CRIMNAL in mapScan"+xpos+ypos+tile);
-		}
+		
 		String behaviorStr = getTileBehavior(tile);
 		if (behaviorStr == null) {
 			return; //nothing to do
 		}
-		System.out.println("behaviorStr="+behaviorStr);
+	
 		TileBehavior b = tileBehaviors.get(behaviorStr);
-		System.out.println("b behavior"+b.tile);
-		
+
 		if (b != null) {
 			b.processTile(xpos, ypos);
 		}
@@ -2491,7 +2493,7 @@ public class Micropolis
 						int c = map[yy][xx];
 						if (CriminalCanRoam(c)) {
 							System.out.println("in setCriminalRoaming"+xx+yy);
-							setTile(xx, yy, CRIMINAL);
+							setTile(crimeMaxLocationX,crimeMaxLocationY, CRIMINAL);
 							CriminalCnt = 30;
 							sendMessageAt(MicropolisMessage.CRIMINALS_ROAMING, xx, yy);
 							CriminalX = xx;

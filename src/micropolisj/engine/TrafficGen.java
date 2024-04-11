@@ -73,6 +73,10 @@ class TrafficGen
 	static final int [] PerimY = { -2,-2,-2, -1, 0, 1,  2, 2, 2,  1, 0,-1 };
 	boolean findPerimeterRoad()
 	{
+		
+		if(sourceZone==ZoneType.PRISON) {
+		System.out.println("in findPerimeterRoad");}
+		
 		for (int z = 0; z < 12; z++)
 		{
 			int tx = mapX + PerimX[z];
@@ -190,6 +194,21 @@ class TrafficGen
 			low = LHTHR;
 			high = COMBASE;
 			break;
+			
+		case PRISON:
+			System.out.println("In case PRISON driveDone");
+			low = LHTHR;
+			high = COMBASE;
+			break;
+		case POLICESTATION:
+			
+			low = LHTHR;
+			high = COMBASE;
+			break;	
+			
+			
+			
+			
 		default:
 			throw new Error("unreachable");
 		}
@@ -226,6 +245,6 @@ class TrafficGen
 	 */
 	static enum ZoneType
 	{
-		RESIDENTIAL, COMMERCIAL, INDUSTRIAL;
+		RESIDENTIAL, COMMERCIAL, INDUSTRIAL, PRISON, POLICESTATION;
 	}
 }

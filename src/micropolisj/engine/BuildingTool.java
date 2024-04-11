@@ -38,6 +38,9 @@ class BuildingTool extends ToolStroke
 			return applyZone(eff, POLICESTATION);
 			
 		case PRISON:
+			
+		
+				
 			return applyZone(eff,PRISON); 
 
 		case POWERPLANT:

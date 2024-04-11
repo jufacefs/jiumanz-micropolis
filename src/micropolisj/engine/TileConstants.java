@@ -154,6 +154,7 @@ public class TileConstants
 	
 	//adding the Prison tile and CriminalsRoaming disaster tile
 	static final char PRISON = 964;
+	
 	static final char CRIMINAL =957;
 
 
