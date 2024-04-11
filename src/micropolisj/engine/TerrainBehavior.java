@@ -10,6 +10,8 @@ package micropolisj.engine;
 
 import static micropolisj.engine.TileConstants.*;
 
+import java.util.List;
+
 class TerrainBehavior extends TileBehavior
 {
 	final B behavior;
@@ -109,90 +111,83 @@ class TerrainBehavior extends TileBehavior
 	}
 
 	
-	
-	
-	void doCriminal()
-	{
-		final int [] DX = { 0, 1, 0, -1 };
-		final int [] DY = { -1, 0, 1, 0 };
-		
-		if (city.CriminalCnt != 0)
-		{
-			for (int z = 0; z < 4; z++)
-			{
-				if (PRNG.nextInt(8) == 0) {
-					int xx = xpos + DX[z];
-					int yy = ypos + DY[z];
-					if (city.testBounds(xx, yy)) {
-						int t = city.getTile(xx, yy);
-						if (CriminalCanRoam(t))
-						
-						{
-							if (isZoneCenter(t))
-								{
-								city.killZone(xx, yy, t);
-								}
-							System.out.println("133");
-							city.setTile(xx, yy, CRIMINAL);
-						}
-					}
-				}
-			}
-		}
-		else {
-			if (PRNG.nextInt(16) == 0) {
-				city.setTile(xpos, ypos, DIRT);
-			}
-		}
-		
-		int cov = city.getPoliceStationCoverage(xpos, ypos);
-		int rate = cov > 100 ? 1 :
-			cov > 20 ? 2 :
-			cov != 0 ? 3 : 10;
-
-		if (PRNG.nextInt(rate+1) == 0) {
-			city.setTile(xpos, ypos,DIRT);
-		}
-	}
-	
-	
 	/**
 	 * Called when the current tile is a flooding tile.
 	 */
 	void doFlood()
 	{
-		
-		
-		System.out.println("在这");
+
+
+	   final int [] DX = { 0, 1, 0, -1 };
+	   final int [] DY = { -1, 0, 1, 0 };
+
+	   if (city.floodCnt != 0)
+	   {
+	      for (int z = 0; z < 4; z++)
+	      {
+	         if (PRNG.nextInt(8) == 0) {
+	            int xx = xpos + DX[z];
+	            int yy = ypos + DY[z];
+	            if (city.testBounds(xx, yy)) {
+	               int t = city.getTile(xx, yy);
+	               if (isCombustible(t)
+	                  || t == DIRT
+	                  || (t >= WOODS5 && t < FLOOD))
+	               {
+	                  if (isZoneCenter(t)) {
+	                     city.killZone(xx, yy, t);
+	                  }
+	                  city.setTile(xx, yy, (char)(FLOOD + PRNG.nextInt(3)));
+	               }
+	            }
+	         }
+	      }
+	   }
+	   else {
+	      if (PRNG.nextInt(16) == 0) {
+	         city.setTile(xpos, ypos, DIRT);
+	      }
+	   }
+	}
+	
+	void doCriminal()
+	{
 		final int [] DX = { 0, 1, 0, -1 };
 		final int [] DY = { -1, 0, 1, 0 };
-		
-		if (city.floodCnt != 0)
+		List<CityLocationPreTile> preTileList = city.preTileList;
+		if (city.CriminalCnt != 0)
 		{
-			for (int z = 0; z < 4; z++)
-			{
-				if (PRNG.nextInt(8) == 0) {
-					int xx = xpos + DX[z];
-					int yy = ypos + DY[z];
-					if (city.testBounds(xx, yy)) {
-						int t = city.getTile(xx, yy);
-						if (isCombustible(t)
-							|| t == DIRT
-							|| (t >= WOODS5 && t < FLOOD))
-						{
-							if (isZoneCenter(t)) {
-								city.killZone(xx, yy, t);
-							}
-							city.setTile(xx, yy, (char)(FLOOD + PRNG.nextInt(3)));
-						}
-					}
-				}
-			}
+		   for (int z = 0; z < 4; z++)
+		   {
+		      if (PRNG.nextInt(23) == 0) {
+		         int xx = xpos + DX[z];
+		         int yy = ypos + DY[z];
+		         if (city.testBounds(xx, yy)) {
+		            int t = city.getTile(xx, yy);
+		            if (CriminalCanRoam(t))
+		            {
+		               if (isZoneCenter(t)){
+		                  continue;
+		               }
+		               preTileList.add(new CityLocationPreTile(xx, yy, city.getTile(xx, yy)));
+		               city.setTile(xx, yy, CRIMINAL);
+		            }
+		         }
+		      }
+		   }
 		}
-		else {
-			if (PRNG.nextInt(16) == 0) {
-				city.setTile(xpos, ypos, DIRT);
-			}
+
+		int cov = city.getPoliceStationCoverage(xpos, ypos);
+		int rate = cov > 100 ? 10 :
+		   cov > 50 ? 15 :
+		   cov != 0 ? 30 :50;
+
+		if (PRNG.nextInt(rate+1) == 0) {
+		   int count = PRNG.nextInt(3);
+		   while (!preTileList.isEmpty() && count-- > 0) {
+		      CityLocationPreTile remove = preTileList.remove(0);
+		      city.setTile(remove.x, remove.y, remove.getPreTile());
+		   }
 		}
 	}
 

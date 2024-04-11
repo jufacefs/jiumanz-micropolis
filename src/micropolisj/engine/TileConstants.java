@@ -131,7 +131,14 @@ public class TileConstants
 	static final char AIRPORT = 716;
 	static final char POWERPLANT = 750;
 	static final char FIRESTATION = 765;
+	
+	
+	
+	static final char POLICESTATIONStTART = 770;
 	static final char POLICESTATION = 774;
+	static final char POLICESTATIONEND = 778;
+	
+	
 	static final char STADIUM = 784;
 	static final char FULLSTADIUM = 800;
 	static final char NUCLEAR = 816;
@@ -154,8 +161,14 @@ public class TileConstants
 	
 	//adding the Prison tile and CriminalsRoaming disaster tile
 	static final char PRISON = 964;
+	static final char PRISONSTART = 960;
+	static final char PRISONEND = 968;
 	
 	static final char CRIMINAL =957;
+	
+	
+	
+	
 
 
 	static final char [] RoadTable = new char[] {
@@ -234,9 +247,6 @@ public class TileConstants
 		assert (tile & LOMASK) == tile;
 	
 		TileSpec ts = Tiles.get(tile);
-		if (tile== 957) {
-			System.out.println("getTIleBeHavior+tileNumber"+ts.tileNumber+ ts.getAttribute("behavior"));
-		}
 		
 		return ts != null ? ts.getAttribute("behavior") : null;
 	}
@@ -417,9 +427,9 @@ public class TileConstants
 	//new boolean make sure criminals roam on streets
 	static boolean CriminalCanRoam(int tile)
 	{
-		assert (tile & LOMASK) == tile;
+	   assert (tile & LOMASK) == tile;
 
-		return ((tile>=ROADBASE) );
+	   return (tile != CRIMINAL);
 	}
 	
 	
@@ -685,6 +695,19 @@ public class TileConstants
 		return tile >= RESBASE;
 	}
 
+	
+	
+	
+	public static boolean isCriminal(int tile)
+	{
+	   assert (tile & LOMASK) == tile;
+
+	   return tile == CRIMINAL;
+	}
+	
+	
+	
+	
 	public static boolean isZoneCenter(int tile)
 	{
 		assert (tile & LOMASK) == tile;

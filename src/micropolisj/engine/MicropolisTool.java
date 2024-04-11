@@ -22,7 +22,7 @@ public enum MicropolisTool
 	COMMERCIAL(3, 100),
 	INDUSTRIAL(3, 100),
 	FIRE(3, 500),
-	POLICE(3, 500),
+	POLICE(3, 0),
 	STADIUM(4, 5000),
 	PARK(1, 10),
 	SEAPORT(4, 3000),
@@ -30,7 +30,7 @@ public enum MicropolisTool
 	NUCLEAR(4, 5000),
 	AIRPORT(6, 10000),
 	QUERY(1, 0),
-	PRISON(3, 500);
+	PRISON(3, 0);
 	
 
 	int size;

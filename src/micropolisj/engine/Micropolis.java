@@ -37,6 +37,9 @@ public class Micropolis
 	 */
 	int [][] landValueMem;
 
+	
+	
+	List<CityLocationPreTile> preTileList;
 	/**
 	 * For each 2x2 section of the city, the pollution level of the city (0-255).
 	 * 0 is no pollution; 255 is maximum pollution.
@@ -262,6 +265,10 @@ public class Micropolis
 
 		centerMassX = hX;
 		centerMassY = hY;
+		
+		
+		
+		preTileList = new ArrayList<>();
 	}
 
 	void fireCensusChanged()
@@ -1237,9 +1244,14 @@ public class Micropolis
 					dis *= 4;
 					dis += terrainMem[y/2][x/2];
 					dis -= pollutionMem[y][x];
+					int tile = getTile(2*x, 2*y);
 					if (crimeMem[y][x] > 190) {
-						dis -= 20;
+					   dis -= 20;
+					}else if(isCriminal(tile)){
+					   dis -= 250;
+					   System.out.println("landvalue --");
 					}
+					
 					if (dis > 250)
 						dis = 250;
 					if (dis < 1)
@@ -2470,43 +2482,77 @@ public class Micropolis
 	}
 	
 	
+	//find a random policestation and see if it's connected to a prison
+	//if it's not, return
 	
-	
+	private int[] findPoliceStation() {
+	      TileBehavior policestation = tileBehaviors.get("POLICESTATION");
+	      TileBehavior prison = tileBehaviors.get("PRISON");
+	      boolean canGoPrison = false;
+	      if(prison != null && Boolean.TRUE.equals(((MapScanner) prison).canGoPrison)) {
+	         canGoPrison = true;
+	      }
+	      if(policestation == null) return null;
+	      MapScanner scanner = (MapScanner) policestation;
+	      List<CityLocation> locations = scanner.polices;
+	      for (int i = 0; i < locations.size(); i++) {
+	         int index = PRNG.nextInt(locations.size());
+	         CityLocation cityLocation = locations.get(index);
+	         TrafficGen traffic = new TrafficGen(this);
+	         traffic.sourceZone = TrafficGen.ZoneType.POLICESTATION;
+	         traffic.mapX = cityLocation.x;
+	         traffic.mapY = cityLocation.y;
+	         if(!canGoPrison || traffic.makeTraffic() != 1) {
+	            return new int[] {cityLocation.x, cityLocation.y};
+	         }
+	      }
+	      return null;
+	   }
+	   public void setCriminalRoaming()
+	   {
+	      final int [] DX = { -1, 0, 1, -1, 1, -1, 0, 1};
+	      final int [] DY = { -1, -1, -1, 0, 0, 1, 1, 1};
 
-	public void setCriminalRoaming()
-	{
-		final int [] DX = { 0, 1, 0, -1 };
-		final int [] DY = { -1, 0, 1, 0 };
-		
-		for (int z = 0; z < 300; z++) {
-			int x = PRNG.nextInt(getWidth());
-			int y = PRNG.nextInt(getHeight());
-			int tile = getTile(x, y);
-	
-			for (int t = 0; t < 4; t++) {
-				int xx = x + DX[t];
-				int yy = y + DY[t];
-			
-				if (testBounds(xx,yy)) {
-					
-				
-						int c = map[yy][xx];
-						if (CriminalCanRoam(c)) {
-							System.out.println("in setCriminalRoaming"+xx+yy);
-							setTile(crimeMaxLocationX,crimeMaxLocationY, CRIMINAL);
-							CriminalCnt = 30;
-							sendMessageAt(MicropolisMessage.CRIMINALS_ROAMING, xx, yy);
-							CriminalX = xx;
-							CriminalY = yy;
-							return;
-						}
-					}
-				}
-			}
-		
-		
-	}
+	      int[] policeStation = findPoliceStation();
+	      if(policeStation == null) {
+	         System.out.println("未找到有路的警察局");
+	         return;
+	      }
 
+	      int x = policeStation[0];
+	      int y = policeStation[1];
+	      int t = PRNG.nextInt(DX.length);
+	      int xx = x + DX[t];
+	      int yy = y + DY[t];
+
+	      if (testBounds(xx,yy)) {
+	         setTile(xx,yy, CRIMINAL);
+	         CriminalCnt = generateCriminal(xx,yy);
+	         sendMessageAt(MicropolisMessage.CRIMINALS_ROAMING, xx, yy);
+	         CriminalX = xx;
+	         CriminalY = yy;
+	      }
+	   }
+
+
+	   private int generateCriminal(int xpos, int ypos) {
+	      int effect = policeMapEffect[ypos / 8][xpos / 8];
+	      
+	    if(effect > 300) {
+	       return 15;
+	    }else if(effect > 200) {
+	       return 20;
+	    }else if (effect > 100) {
+	       return 30;
+	    }else if(effect > 50) {
+	       return 40;
+	    }else if(effect > 20) {
+	    	return 50;
+	    }
+	    return 70;
+	   }
+	      
+  
 
 	/**
 	 * Makes all component tiles of a zone bulldozable.

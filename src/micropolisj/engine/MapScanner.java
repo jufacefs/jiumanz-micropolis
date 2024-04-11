@@ -11,6 +11,9 @@ package micropolisj.engine;
 import static micropolisj.engine.TileConstants.*;
 import static micropolisj.engine.TrafficGen.ZoneType;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Process individual tiles of the map for each cycle.
  * In each sim cycle each tile will get activated, and this
@@ -20,12 +23,17 @@ class MapScanner extends TileBehavior
 {
 	final B behavior;
 	TrafficGen traffic;
-
+	List<CityLocation> polices;
+	boolean canGoPrison;
+	
+	
 	MapScanner(Micropolis city, B behavior)
 	{
 		super(city);
 		this.behavior = behavior;
 		this.traffic = new TrafficGen(city);
+		
+		this.polices = new ArrayList<>();
 	}
 
 	public static enum B
@@ -262,17 +270,16 @@ class MapScanner extends TileBehavior
 			z /= 2;
 		}
 
-		city.policeMap[ypos/8][xpos/8] += z;
-		
 
-		
-		int trafficGood;
-		
-		trafficGood = makeTraffic(ZoneType.POLICESTATION);
-		if( trafficGood==1) {
-			System.out.println("traffic to policestation");
+		//recording the locations of police stations
+		if(isZoneCenter(city.getTile(xpos,ypos))) {
+			   CityLocation cityLocation = new CityLocation(xpos, ypos);
+			   if(!polices.contains(cityLocation)) {
+			      polices.add(cityLocation);
+			   }
+			}
+			city.policeMap[ypos/8][xpos/8] += z;
 			
-		}
 		
 	}
 	
@@ -295,19 +302,19 @@ class MapScanner extends TileBehavior
 
 		traffic.mapX = xpos;
 		traffic.mapY = ypos;
-		if (!traffic.findPerimeterRoad()) {
-			z /= 2;
+		
+
+		//try to see if the prison is connected to roads
+		traffic.sourceZone = ZoneType.PRISON;
+		if(isZoneCenter(city.getTile(xpos,ypos))){
+		   if (traffic.makeTraffic() != 1) {
+		      z /= 2;
+		   }else {
+		      canGoPrison = true;
+		   }
 		}
 
-		
 		city.policeMap[ypos/8][xpos/8] += z;
-		int trafficGood;
-		
-		trafficGood = makeTraffic(ZoneType.PRISON);
-		if( trafficGood==1) {
-			System.out.println("traffic to prison");}
-			
-	
 		
 	}
 

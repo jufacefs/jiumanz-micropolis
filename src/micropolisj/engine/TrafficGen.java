@@ -150,7 +150,7 @@ class TrafficGen
 	boolean tryGo(int z)
 	{
 		// random starting direction
-		int rdir = city.PRNG.nextInt(4);
+		int rdir = 2 ;
 
 		for (int d = rdir; d < rdir + 4; d++)
 		{
@@ -194,17 +194,15 @@ class TrafficGen
 			low = LHTHR;
 			high = COMBASE;
 			break;
-			
 		case PRISON:
-			System.out.println("In case PRISON driveDone");
-			low = LHTHR;
-			high = COMBASE;
+			low = POLICESTATIONStTART;
+			high = POLICESTATIONEND;
 			break;
 		case POLICESTATION:
-			
-			low = LHTHR;
-			high = COMBASE;
-			break;	
+
+			low = PRISONSTART;
+			high = PRISONEND;
+			break;
 			
 			
 			
