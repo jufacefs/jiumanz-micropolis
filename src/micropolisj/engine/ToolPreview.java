@@ -148,7 +148,6 @@ public class ToolPreview implements ToolEffectIfc
 	//implements ToolEffectIfc
 	public void setTile(int dx, int dy, int tileValue)
 	{
-		System.out.println("tilevalue in setTile in ToolPReview"+tileValue);
 		expandTo(dx, dy);
 		tiles[offsetY+dy][offsetX+dx] = (short)tileValue;
 	}

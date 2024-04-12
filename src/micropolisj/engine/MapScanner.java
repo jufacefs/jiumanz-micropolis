@@ -24,15 +24,14 @@ class MapScanner extends TileBehavior
 	final B behavior;
 	TrafficGen traffic;
 	List<CityLocation> polices;
-	boolean canGoPrison;
-	
-	
+
+
 	MapScanner(Micropolis city, B behavior)
 	{
 		super(city);
 		this.behavior = behavior;
 		this.traffic = new TrafficGen(city);
-		
+
 		this.polices = new ArrayList<>();
 	}
 
@@ -90,23 +89,23 @@ class MapScanner extends TileBehavior
 		case AIRPORT:
 			doAirport();
 			return;
-			
+
 		case PRISON:
 			doPrison();
 			return;
-			
-			
-			
+
+
+
 		case SEAPORT:
 			doSeaport();
 			return;
 		default:
 			assert false;
-			
-			
-		
-			
-		
+
+
+
+
+
 		}
 	}
 
@@ -242,7 +241,7 @@ class MapScanner extends TileBehavior
 
 		traffic.mapX = xpos;
 		traffic.mapY = ypos;
-		if (!traffic.findPerimeterRoad()) {
+		if (traffic.findPerimeterRoad(xpos,ypos).isEmpty()) {
 			z /= 2;
 		}
 
@@ -266,7 +265,7 @@ class MapScanner extends TileBehavior
 
 		traffic.mapX = xpos;
 		traffic.mapY = ypos;
-		if (!traffic.findPerimeterRoad()) {
+		if (traffic.findPerimeterRoad(xpos,ypos).isEmpty()) {
 			z /= 2;
 		}
 
@@ -279,12 +278,12 @@ class MapScanner extends TileBehavior
 			   }
 			}
 			city.policeMap[ypos/8][xpos/8] += z;
-			
-		
+
+
 	}
-	
-	
-	
+
+
+
 	void doPrison()
 	{
 		boolean powerOn = checkZonePower();
@@ -300,28 +299,24 @@ class MapScanner extends TileBehavior
 			z = city.policeEffect / 2;
 		}
 
-		traffic.mapX = xpos;
-		traffic.mapY = ypos;
-		
+
 
 		//try to see if the prison is connected to roads
 		traffic.sourceZone = ZoneType.PRISON;
 		if(isZoneCenter(city.getTile(xpos,ypos))){
-		   if (traffic.makeTraffic() != 1) {
+		   if (traffic.makeTraffic(xpos,ypos) != 1) {
 		      z /= 2;
-		   }else {
-		      canGoPrison = true;
 		   }
 		}
 
 		city.policeMap[ypos/8][xpos/8] += z;
-		
+
 	}
 
-	
-	
-	
-	
+
+
+
+
 	void doStadiumEmpty()
 	{
 		boolean powerOn = checkZonePower();
@@ -1028,6 +1023,6 @@ class MapScanner extends TileBehavior
 		traffic.mapX = xpos;
 		traffic.mapY = ypos;
 		traffic.sourceZone = zoneType;
-		return traffic.makeTraffic();
+		return traffic.makeTraffic(xpos,ypos);
 	}
 }
