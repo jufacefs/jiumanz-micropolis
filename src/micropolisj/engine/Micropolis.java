@@ -37,8 +37,8 @@ public class Micropolis
 	 */
 	int [][] landValueMem;
 
-	
-	
+
+
 	List<CityLocationPreTile> preTileList;
 	/**
 	 * For each 2x2 section of the city, the pollution level of the city (0-255).
@@ -122,11 +122,11 @@ public class Micropolis
 	int hospitalCount;
 	int churchCount;
 	int policeCount;
-	
+
 	int prisonCount;
-	
-	
-	
+
+
+
 	int fireStationCount;
 	int stadiumCount;
 	int coalCount;
@@ -194,14 +194,14 @@ public class Micropolis
 	int floodX;
 	int floodY;
 
-	
-	
+
+
 	int CriminalCnt;
 	int CriminalX;
 	int CriminalY;
-	
-	
-	
+
+
+
 	public int cityTime;  //counts "weeks" (actually, 1/48'ths years)
 	int scycle; //same as cityTime, except mod 1024
 	int fcycle; //counts simulation steps (mod 1024)
@@ -265,9 +265,9 @@ public class Micropolis
 
 		centerMassX = hX;
 		centerMassY = hY;
-		
-		
-		
+
+
+
 		preTileList = new ArrayList<>();
 	}
 
@@ -492,7 +492,7 @@ public class Micropolis
 		// check to make sure we aren't setting an upper bit using
 		// this method
 		assert (newTile & LOMASK) == newTile;
-		
+
 		if (map[ypos][xpos] != newTile)
 		{
 			map[ypos][xpos] = newTile;
@@ -551,15 +551,15 @@ public class Micropolis
 		indZoneCount = 0;
 		hospitalCount = 0;
 		churchCount = 0;
-		
-		
-		
+
+
+
 		policeCount = 0;
 		prisonCount=0;
-		
-		
-		
-		
+
+
+
+
 		fireStationCount = 0;
 		stadiumCount = 0;
 		coalCount = 0;
@@ -726,7 +726,7 @@ public class Micropolis
 				tem2[y][x] = z;
 			}
 		}
-	
+
 		return tem2;
 	}
 
@@ -908,20 +908,20 @@ public class Micropolis
 
 		fireMapOverlayDataChanged(MapState.POLICE_OVERLAY);
 	}
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
 
 	void doDisasters()
 	{
 		if (floodCnt > 0) {
 			floodCnt--;
 		}
-		
+
 		if (CriminalCnt > 0) {
 			CriminalCnt--;
 		}
@@ -942,7 +942,7 @@ public class Micropolis
 		case 2:
 		case 3:
 			makeFlood();
-			
+
 			break;
 		case 4:
 			break;
@@ -960,8 +960,8 @@ public class Micropolis
 				makeMonster();
 			}
 			break;
-		
-			
+
+
 		}
 	}
 
@@ -1163,8 +1163,8 @@ public class Micropolis
 	}
 
 
-	
-	
+
+
 	/** Accessor method for landValueMem overlay. */
 	public int getLandValue(int xpos, int ypos)
 	{
@@ -1251,7 +1251,7 @@ public class Micropolis
 					   dis -= 250;
 					   System.out.println("landvalue --");
 					}
-					
+
 					if (dis > 250)
 						dis = 250;
 					if (dis < 1)
@@ -1524,21 +1524,21 @@ public class Micropolis
 		tileBehaviors.put("STADIUM_FULL", new MapScanner(this, MapScanner.B.STADIUM_FULL));
 		tileBehaviors.put("AIRPORT", new MapScanner(this, MapScanner.B.AIRPORT));
 		tileBehaviors.put("SEAPORT", new MapScanner(this, MapScanner.B.SEAPORT));
-		
-		
+
+
 		//new zone behavior Prison
 		tileBehaviors.put("PRISON", new MapScanner(this, MapScanner.B.PRISON));
-		
+
 		tileBehaviors.put("CRIMINAL", new TerrainBehavior(this, TerrainBehavior.B.CRIMINAL));
-	
+
 	}
 
 	void mapScan(int x0, int x1)
 	{
-	
+
 		for (int x = x0; x < x1; x++)
 		{
-			
+
 			for (int y = 0; y < getHeight(); y++)
 			{
 				mapScanTile(x, y);
@@ -1548,15 +1548,15 @@ public class Micropolis
 
 	void mapScanTile(int xpos, int ypos)
 	{
-		
-		
+
+
 		int tile = getTile(xpos, ypos);
-		
+
 		String behaviorStr = getTileBehavior(tile);
 		if (behaviorStr == null) {
 			return; //nothing to do
 		}
-	
+
 		TileBehavior b = tileBehaviors.get(behaviorStr);
 
 		if (b != null) {
@@ -2338,17 +2338,17 @@ public class Micropolis
 			sendMessageAt(MicropolisMessage.FIRE_REPORT, x, y);
 		}
 	}
-	
-	
-		
 
 
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
 	public void makeFire()
 	{
 		// forty attempts at finding place to start fire
@@ -2448,12 +2448,12 @@ public class Micropolis
 
 	public void makeFlood()
 	{
-		
+
 		final int [] DX = { 0, 1, 0, -1 };
 		final int [] DY = { -1, 0, 1, 0 };
 
 		for (int z = 0; z < 300; z++) {
-			
+
 			int x = PRNG.nextInt(getWidth());
 			int y = PRNG.nextInt(getHeight());
 			int tile = getTile(x, y);
@@ -2466,7 +2466,7 @@ public class Micropolis
 					if (testBounds(xx,yy)) {
 						int c = map[yy][xx];
 						if (isFloodable(c)) {
-							
+
 							setTile(xx, yy, FLOOD);
 							System.out.println("in makeFlood"+xx+yy);
 							floodCnt = 30;
@@ -2480,33 +2480,31 @@ public class Micropolis
 			}
 		}
 	}
-	
-	
+
+
 	//find a random policestation and see if it's connected to a prison
 	//if it's not, return
-	
+
 	private int[] findPoliceStation() {
-	      TileBehavior policestation = tileBehaviors.get("POLICESTATION");
-	      TileBehavior prison = tileBehaviors.get("PRISON");
-	      boolean canGoPrison = false;
-	      if(prison != null && Boolean.TRUE.equals(((MapScanner) prison).canGoPrison)) {
-	         canGoPrison = true;
-	      }
-	      if(policestation == null) return null;
-	      MapScanner scanner = (MapScanner) policestation;
-	      List<CityLocation> locations = scanner.polices;
-	      for (int i = 0; i < locations.size(); i++) {
-	         int index = PRNG.nextInt(locations.size());
-	         CityLocation cityLocation = locations.get(index);
-	         TrafficGen traffic = new TrafficGen(this);
-	         traffic.sourceZone = TrafficGen.ZoneType.POLICESTATION;
-	         traffic.mapX = cityLocation.x;
-	         traffic.mapY = cityLocation.y;
-	         if(!canGoPrison || traffic.makeTraffic() != 1) {
-	            return new int[] {cityLocation.x, cityLocation.y};
-	         }
-	      }
-	      return null;
+		TileBehavior policestation = tileBehaviors.get("POLICESTATION");
+		if(policestation == null) return null;
+		MapScanner scanner = (MapScanner) policestation;
+		List<CityLocation> locations = scanner.polices;
+		Set<Integer> set = new HashSet<>();
+		for (int i = 0; i < locations.size(); i++) {
+			int index = PRNG.nextInt(locations.size());
+			if(!set.add(index)) {
+				i--;
+				continue;
+			}
+			CityLocation cityLocation = locations.get(index);
+			TrafficGen traffic = new TrafficGen(this);
+			traffic.sourceZone = TrafficGen.ZoneType.POLICESTATION;
+			if(traffic.makeTraffic(cityLocation.x,cityLocation.y) != 1) {
+				return new int[] {cityLocation.x, cityLocation.y};
+			}
+		}
+		return null;
 	   }
 	   public void setCriminalRoaming()
 	   {
@@ -2537,7 +2535,7 @@ public class Micropolis
 
 	   private int generateCriminal(int xpos, int ypos) {
 	      int effect = policeMapEffect[ypos / 8][xpos / 8];
-	      
+
 	    if(effect > 300) {
 	       return 15;
 	    }else if(effect > 200) {
@@ -2551,8 +2549,8 @@ public class Micropolis
 	    }
 	    return 70;
 	   }
-	      
-  
+
+
 
 	/**
 	 * Makes all component tiles of a zone bulldozable.
@@ -2760,10 +2758,10 @@ public class Micropolis
 				sendMessage(MicropolisMessage.PRISON_NEED_LINK);
 			}
 			break;
-			
-			
-			
-			
+
+
+
+
 		case 51:
 			if (cityTax > 12) {
 				sendMessage(MicropolisMessage.HIGH_TAXES);

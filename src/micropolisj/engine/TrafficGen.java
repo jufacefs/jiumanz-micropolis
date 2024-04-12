@@ -21,8 +21,6 @@ class TrafficGen
 	int mapY;
 	ZoneType sourceZone;
 
-	int lastdir;
-	Stack<CityLocation> positions = new Stack<CityLocation>();
 
 	static final int MAX_TRAFFIC_DISTANCE = 30;
 
@@ -31,14 +29,16 @@ class TrafficGen
 		this.city = city;
 	}
 
-	int makeTraffic()
+	int makeTraffic(int mapX, int mapY)
 	{
-		if (findPerimeterRoad()) //look for road on this zone's perimeter
+		List<CityLocation> perimeterRoad = findPerimeterRoad(mapX, mapY);
+		if (!perimeterRoad.isEmpty()) //look for road on this zone's perimeter
 		{
-			if (tryDrive())  //attempt to drive somewhere
+
+			if (tryDrive(perimeterRoad))  //attempt to drive somewhere
 			{
 				// success; incr trafdensity
-				setTrafficMem();
+
 				return 1;
 			}
 
@@ -51,7 +51,7 @@ class TrafficGen
 		}
 	}
 
-	void setTrafficMem()
+	void setTrafficMem(Stack<CityLocation> positions)
 	{
 		while (!positions.isEmpty())
 		{
@@ -71,12 +71,10 @@ class TrafficGen
 
 	static final int [] PerimX = { -1, 0, 1,  2, 2, 2,  1, 0,-1, -2,-2,-2 };
 	static final int [] PerimY = { -2,-2,-2, -1, 0, 1,  2, 2, 2,  1, 0,-1 };
-	boolean findPerimeterRoad()
+	List<CityLocation> findPerimeterRoad(int mapX, int mapY)
 	{
-		
-		if(sourceZone==ZoneType.PRISON) {
-		System.out.println("in findPerimeterRoad");}
-		
+
+		List<CityLocation> cityLocations = new ArrayList<>();
 		for (int z = 0; z < 12; z++)
 		{
 			int tx = mapX + PerimX[z];
@@ -84,12 +82,10 @@ class TrafficGen
 
 			if (roadTest(tx, ty))
 			{
-				mapX = tx;
-				mapY = ty;
-				return true;
+				cityLocations.add(new CityLocation(tx,ty));
 			}
 		}
-		return false;
+		return cityLocations;
 	}
 
 	boolean roadTest(int tx, int ty)
@@ -110,33 +106,39 @@ class TrafficGen
 			return true;
 	}
 
-	boolean tryDrive()
+	boolean tryDrive(List<CityLocation> list)
 	{
-		lastdir = 5;
-		positions.clear();
+		Stack<CityLocation> positions = new Stack<CityLocation>();
+		Set<CityLocation> visited = new HashSet<>();
 
-		for (int z = 0; z < MAX_TRAFFIC_DISTANCE; z++) //maximum distance to try
-		{
-			if (tryGo(z))
-			{
-				// got a road
-				if (driveDone())
-				{
-					// destination reached
-					return true;
-				}
+		for (CityLocation cityLocation : list) {
+			if(visited.contains(cityLocation)) {
+				continue;
 			}
-			else
+			visited.add(cityLocation);
+			CityLocation location = new CityLocation(cityLocation.x,cityLocation.y);
+			for (int z = 0; z < MAX_TRAFFIC_DISTANCE; z++) //maximum distance to try
 			{
-				// deadend, try backing up
-				if (!positions.isEmpty())
+				if (tryGo(visited,location,positions))
 				{
-					positions.pop();
-					z += 3;
+					// got a road
+					if (driveDone(location.x, location.y))
+					{
+						setTrafficMem(positions);
+						// destination reached
+						return true;
+					}
 				}
 				else
 				{
-					return false;
+					// deadend, try backing up
+					if (!positions.isEmpty())
+					{
+						CityLocation pop = positions.pop();
+						location.x = pop.x;
+						location.y = pop.y;
+						z -= 2;
+					}
 				}
 			}
 		}
@@ -147,29 +149,24 @@ class TrafficGen
 
 	static final int [] DX = { 0, 1, 0, -1 };
 	static final int [] DY = { -1, 0, 1, 0 };
-	boolean tryGo(int z)
+	boolean tryGo(Set<CityLocation> visited, CityLocation cityLocation, Stack<CityLocation> positions)
 	{
-		// random starting direction
-		int rdir = city.PRNG.nextInt(4);
 
-		for (int d = rdir; d < rdir + 4; d++)
+		for (int d = 0; d < 4; d++)
 		{
-			int realdir = d % 4;
-			if (realdir == lastdir)
+
+			int nx = cityLocation.x + DX[d];
+			int ny = cityLocation.y + DY[d];
+			if(visited.contains(new CityLocation(nx,ny))) {
 				continue;
-
-			if (roadTest(mapX + DX[realdir], mapY + DY[realdir]))
+			}
+			if (roadTest(nx, ny))
 			{
-				mapX += DX[realdir];
-				mapY += DY[realdir];
-				lastdir = (realdir + 2) % 4;
+				cityLocation.x = nx;
+				cityLocation.y = ny;
 
-				if (z % 2 == 1)
-				{
-					// save pos every other move
-					positions.push(new CityLocation(mapX, mapY));
-				}
-
+				// save pos every other move
+				visited.add(positions.push(new CityLocation(nx, ny)));
 				return true;
 			}
 		}
@@ -177,7 +174,7 @@ class TrafficGen
 		return false;
 	}
 
-	boolean driveDone()
+	boolean driveDone(int mapX, int mapY)
 	{
 		int low, high;
 		switch (sourceZone)
@@ -203,10 +200,10 @@ class TrafficGen
 			low = PRISONSTART;
 			high = PRISONEND;
 			break;
-			
-			
-			
-			
+
+
+
+
 		default:
 			throw new Error("unreachable");
 		}
