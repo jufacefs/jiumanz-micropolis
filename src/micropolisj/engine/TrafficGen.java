@@ -150,7 +150,7 @@ class TrafficGen
 	boolean tryGo(int z)
 	{
 		// random starting direction
-		int rdir = 2 ;
+		int rdir = city.PRNG.nextInt(4);
 
 		for (int d = rdir; d < rdir + 4; d++)
 		{
