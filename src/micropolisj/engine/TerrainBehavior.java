@@ -159,7 +159,7 @@ class TerrainBehavior extends TileBehavior
 		{
 		   for (int z = 0; z < 4; z++)
 		   {
-		      if (PRNG.nextInt(23) == 0) {
+		      if (PRNG.nextInt(15) == 0) {
 		         int xx = xpos + DX[z];
 		         int yy = ypos + DY[z];
 		         if (city.testBounds(xx, yy)) {
@@ -176,11 +176,12 @@ class TerrainBehavior extends TileBehavior
 		      }
 		   }
 		}
-
+		
+		//eliminate the criminals based on police coverage
 		int cov = city.getPoliceStationCoverage(xpos, ypos);
-		int rate = cov > 100 ? 10 :
-		   cov > 50 ? 15 :
-		   cov != 0 ? 30 :50;
+		int rate = cov > 150 ? 10 :
+		   cov > 50 ? 13 :
+		   cov != 0 ? 20 :40;
 
 		if (PRNG.nextInt(rate+1) == 0) {
 		   int count = PRNG.nextInt(3);
